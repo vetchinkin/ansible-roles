@@ -5,3 +5,38 @@
   timezone:
     name: Europe/Moscow
 
+- block:
+    - name: create a swap file
+      shell: fallocate -l {{ swap_size }} /swapfile
+      args:
+        creates: /swapfile
+
+    - name: set the correct permissions
+      file:
+        path: /swapfile
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: make the file a swap file
+      shell: mkswap /swapfile
+      when: ansible_facts.swapfree_mb == 0
+
+    - name: enable the swap file
+      shell: swapon /swapfile
+      when: ansible_facts.swapfree_mb == 0
+
+    - name: add swap file to fstab
+      mount:
+        name: none
+        src: /swapfile
+        fstype: swap
+        opts: sw
+        passno: 0
+        dump: 0
+        state: present
+
+- name: Set a hostname
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+
