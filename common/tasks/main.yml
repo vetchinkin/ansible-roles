@@ -3,33 +3,33 @@
 
 - name: set timezone to Europe/Moscow
   timezone:
-    name: Europe/Moscow
+    name: "{{ timezone_name }}"
 
 - block:
     - name: create a swap file
-      shell: fallocate -l {{ swap_size }} /swapfile
+      shell: fallocate -l {{ swap_size }} {{ swap_file }}
       args:
-        creates: /swapfile
+        creates: "{{ swap_file }}"
 
     - name: set the correct permissions
       file:
-        path: /swapfile
+        path: "{{ swap_file }}"
         owner: root
         group: root
         mode: '0600'
 
     - name: make the file a swap file
-      shell: mkswap /swapfile
+      shell: mkswap {{ swap_file }}
       when: ansible_facts.swapfree_mb == 0
 
     - name: enable the swap file
-      shell: swapon /swapfile
+      shell: swapon {{ swap_file }}
       when: ansible_facts.swapfree_mb == 0
 
     - name: add swap file to fstab
       mount:
         name: none
-        src: /swapfile
+        src: "{{ swap_file }}"
         fstype: swap
         opts: sw
         passno: 0
