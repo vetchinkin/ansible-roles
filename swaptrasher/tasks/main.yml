@@ -1,0 +1,19 @@
+---
+# tasks file for swaptrasher
+
+- block:
+  - name: disable swap
+    shell: swapoff -a
+
+  - name: remove swap file
+    file:
+      path: "{{ swap_file }}"
+      state: absent
+    
+  - name: remove swap from fstab
+    lineinfile:
+      path: /etc/fstab
+      state: absent
+      regexp: '^{{ swap_file }}'
+  when: ansible_facts.swapfree_mb != 0
+
