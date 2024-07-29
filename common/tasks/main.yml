@@ -4,6 +4,17 @@
 - name: set timezone to Europe/Moscow
   timezone:
     name: "{{ timezone_name }}"
+  become: yes
+
+- name: Set a hostname
+  hostname:
+    name: "{{ inventory_hostname }}"
+  become: yes
+
+- name: update apt cache
+  apt:
+    update_cache: yes
+  become: yes
 
 - block:
     - name: create a swap file
@@ -35,8 +46,5 @@
         passno: 0
         dump: 0
         state: present
-
-- name: Set a hostname
-  ansible.builtin.hostname:
-    name: "{{ inventory_hostname }}"
+  become: yes
 

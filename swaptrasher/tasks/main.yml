@@ -16,4 +16,5 @@
       state: absent
       regexp: '^{{ swap_file }}'
   when: ansible_facts.swapfree_mb != 0
+  become: yes
 
